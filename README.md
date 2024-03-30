@@ -1,1 +1,1 @@
-# aosp_releases
+# kernel_releases
