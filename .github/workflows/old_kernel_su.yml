@@ -43,4 +43,4 @@ jobs:
           name: ${{ env.ZIP_NAME }}
           tag_name: ${{ github.run_id }}
           body: |
-            4.14.190 | Non KernelSU
+            4.14.190 | KernelSU
