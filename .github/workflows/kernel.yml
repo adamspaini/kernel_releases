@@ -26,7 +26,7 @@ jobs:
         run: git clone https://github.com/GXC2356/platform_kernel_xiaomi_vayu.git -b main --depth=1 .
 
       - name: Start Compilation
-        run: bash tools/build/build.sh && bash tools/build/build.sh
+        run: bash tools/build/build.sh ; bash tools/build/build.sh
 
       - name: Set-up files
         run: |
