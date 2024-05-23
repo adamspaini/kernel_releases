@@ -16,7 +16,7 @@ jobs:
         run: rm -rf ${{ github.workspace }}/*
 
       - name: Clone clang source
-        run: git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/refs/heads/master/clang-r498229b.git -b 14.0 ~/tc/clang-r498229b;
+        run: git clone --depth=1 git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 ~/tc
 
       - name: Set-up environment
         run: |
