@@ -15,6 +15,9 @@ jobs:
       - name: Cleanup
         run: rm -rf ${{ github.workspace }}/*
 
+      - name: Clone clang source
+        run: git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r498229b.git -b 14.0 ~/tc/clang-r498229b
+
       - name: Set-up environment
         run: |
           sudo apt-get update
