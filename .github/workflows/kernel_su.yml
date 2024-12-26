@@ -26,6 +26,9 @@ jobs:
       - name: Install required debs
         run: bash tools/build/packages.sh
 
+      - name: Sync
+        run: bash tools/build/sync.sh
+
       - name: Start Compilation
         run: bash tools/build/build.sh
 
