@@ -1,0 +1,47 @@
+name: Build and Release Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Kernel:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+       shell: bash
+       working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Cleanup
+        run: rm -rf ${{ github.workspace }}/*
+
+      - name: Update system
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+
+      - name: Clone kernel source
+        run: git clone https://github.com/GXC2356/WSL2-Linux-Kernel.git -b linux-msft-wsl-6.6.y --depth=1 .
+
+      - name: Install required debs
+        run: sudo apt install build-essential flex bison dwarves libssl-dev libelf-dev cpio qemu-utils bc kmod
+
+      - name: Start Compilation
+        run:  make oldconfig KCONFIG_CONFIG=Microsoft/config-wsl && make KCONFIG_CONFIG=Microsoft/config-wsl && make INSTALL_MOD_PATH="$PWD/modules" modules_install
+
+      - name: Set-up files
+        run: |
+          # Set-up files info
+            file=out/arch/x86/boot/bzImage
+            echo "FILE=$file" >> $GITHUB_ENV
+            echo "NAME=$(basename "$file" )" >> $GITHUB_ENV
+
+      - name: Upload files to repository releases page
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ env.FILE }}
+          name: ${{ env.NAME }}
+          tag_name: ${{ github.run_id }}
+          body: |
+            WSL2 Kernel
