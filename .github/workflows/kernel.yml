@@ -21,7 +21,7 @@ jobs:
           sudo apt-get upgrade
 
       - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/kernel_xiaomi_vayu.git -b fifteen --depth=1 .
+        run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen --depth=1 .
 
       - name: Install required debs
         run: bash tools/build/packages.sh
