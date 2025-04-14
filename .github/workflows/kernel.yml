@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Cleanup
-        run: rm -rf ${{ github.workspace }}/*
+        run: bash tools/build/clean.sh
 
       - name: Update system
         run: |
@@ -32,7 +32,7 @@ jobs:
       - name: Set-up files
         run: |
           # Set-up files info
-            zip_file=$(find $HOME -name 'Gorekernel_vayu_nonksu*.zip' -print -quit)
+            zip_file=$(find $HOME -name 'Gorekernel_vayu*.zip' -print -quit)
             echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
             echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
 
