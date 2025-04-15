@@ -11,42 +11,38 @@ jobs:
        shell: bash
        working-directory: ${{ github.workspace }}
 
-
     steps:
       - name: Cleanup
-        run: rm -rf ${{ github.workspace }}/*
+        run: rm -rf ${{ github.workspace }}/build_output*
 
-
-       - name: Set up swap
-         run: |
-          sudo fallocate -l 8G /swapfile
+      - name: Set up swap
+        run: |
+          sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
-          sudo swapon /swapfile
-        
+          sudo swapon --priority 10 /swapfile
 
       - name: Update system
         run: |
-          sudo apt-get update
-          sudo apt-get upgrade
-          sudo apt-get update
-          sudo apt-get install build-essential libncurses-dev bison flex libssl-dev libelf-dev bc
+          sudo apt-get update && sudo apt-get upgrade -y
+          sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev bc
 
       - name: Clone kernel source
         run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen --depth=1 .
 
-      - name: Install required debs
-        run: bash tools/build/packages.sh
+      - name: Install required packages
+        run: sudo apt-get install -y $(cat tools/build/packages.txt)
 
       - name: Start Compilation
         run: bash tools/build/build.sh
 
       - name: Set-up files
         run: |
-          # Set-up files info
-            zip_file=$(find $HOME -name 'Gorekernel_vayu*.zip' -print -quit)
-            echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
-            echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
+          output_dir="${{ github.workspace }}/output"
+          mkdir -p "$output_dir"
+          zip_file=$(find "$output_dir" -name 'Gorekernel_vayu*.zip' -print -quit)
+          echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
+          echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
 
       - name: Upload files to repository releases page
         uses: softprops/action-gh-release@v1
