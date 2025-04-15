@@ -11,14 +11,26 @@ jobs:
        shell: bash
        working-directory: ${{ github.workspace }}
 
+
     steps:
       - name: Cleanup
         run: rm -rf ${{ github.workspace }}/*
+
+
+       - name: Set up swap
+         run: |
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+        
 
       - name: Update system
         run: |
           sudo apt-get update
           sudo apt-get upgrade
+          sudo apt-get update
+          sudo apt-get install build-essential libncurses-dev bison flex libssl-dev libelf-dev bc
 
       - name: Clone kernel source
         run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen --depth=1 .
