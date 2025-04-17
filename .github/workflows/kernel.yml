@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-       shell: bash
-       working-directory: ${{ github.workspace }}
+        shell: bash
+        working-directory: ${{ github.workspace }}
 
     steps:
       - name: Cleanup
@@ -26,15 +26,13 @@ jobs:
       - name: Clone kernel source
         run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen --depth=1 .
 
-
-
       - name: Setup Swap
         run: |
           sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon --priority 10 /swapfile
-          
+
       - name: Start Compilation
         run: bash tools/build/build.sh
 
