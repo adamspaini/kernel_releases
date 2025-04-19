@@ -22,42 +22,9 @@ jobs:
           sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev bc ccache lld llvm device-tree-compiler nano ca-certificates curl git libc6-dev openssl python3 python3-pip python-is-python3 ssh wget zip zstd make clang software-properties-common libarchive-tools gcc-13-aarch64-linux-gnu g++-13-aarch64-linux-gnu gcc-13-arm-linux-gnueabi g++-13-arm-linux-gnueabi libffi-dev libreadline-dev libbz2-dev libsqlite3-dev pigz cpio neofetch
           sudo apt-get upgrade -y
           neofetch
-
+          
       - name: Clone kernel source
         run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen-ksu --depth=1 .
-
-      - name: Clone KernelSU (Next)
-        run: |
-          git clone https://github.com/tiann/KernelSU --depth=1 -b main KernelSU
-          echo "✅ KernelSU clonado"
-
-      - name: Integrate KernelSU to source
-        run: |
-          # Eliminar líneas rotas anteriores del Makefile
-          sed -i '/\\\/KernelSU\\/d' Makefile
-          sed -i '/KernelSU\\/kernel\\/kernelsu.mk/d' Makefile
-
-          # Agregar include si no está presente
-          grep -q 'KernelSU/kernel/kernelsu.mk' Makefile || {
-            echo '' >> Makefile
-            echo '# KernelSU' >> Makefile
-            echo 'include \$(srctree)/KernelSU/kernel/kernelsu.mk' >> Makefile
-          }
-
-          # Agregar CONFIG_KSU al defconfig si no está
-          grep -q 'CONFIG_KSU' arch/arm64/configs/vayu_defconfig || \
-            echo 'CONFIG_KSU=y' >> arch/arm64/configs/vayu_defconfig
-
-      - name: Verify CONFIG_KSU is set
-        run: |
-          make O=out vayu_defconfig
-          if ! grep -q 'CONFIG_KSU=y' out/.config; then
-            echo "ERROR: CONFIG_KSU=y no está presente en .config"
-            echo "Verifica que el Makefile y el defconfig estén correctamente configurados."
-            exit 1
-          else
-            echo "✅ CONFIG_KSU=y detectado correctamente"
-          fi
 
       - name: Setup Swap
         run: |
@@ -65,6 +32,10 @@ jobs:
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon --priority 10 /swapfile
+
+      - name: Integrate KernelSU Next
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
 
       - name: Start Compilation
         run: bash tools/build/build.sh
@@ -91,10 +62,10 @@ jobs:
         with:
           files: |
             ${{ env.ZIP_FILE }}
-          name: ${{ env.ZIP_NAME }}
+          name: KernelSU-Next Release
           tag_name: ${{ github.run_id }}
           body: |
-            KernelSU NEXT
+            KernelSU Next
             Automatically compiled with Clang.
             Android 15 ready
 
