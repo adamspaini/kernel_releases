@@ -58,8 +58,7 @@ jobs:
         with:
           files: |
             ${{ env.ZIP_FILE }}
-          name: ${{ env.ZIP_NAME }}
-          tag_name: ${{ github.run_id }}
+          name: KernelSU-Next Release
           body: |
             KernelSU Next 
             Automatically compiled with Clang.
