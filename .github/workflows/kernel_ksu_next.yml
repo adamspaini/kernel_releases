@@ -26,6 +26,21 @@ jobs:
       - name: Clone kernel source
         run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen-ksu --depth=1 .
 
+      - name: Clone KernelSU (Next)
+        run: |
+          git clone https://github.com/tiann/KernelSU --depth=1 -b main KernelSU
+          echo "✅ KernelSU clonado"
+
+      - name: Integrate KernelSU to source
+        run: |
+          # Añadir include al Makefile si no está
+          grep -q 'KernelSU/kernel/kernelsu.mk' Makefile || \
+            echo -e '\n# KernelSU\ninclude \$(srctree)/KernelSU/kernel/kernelsu.mk' >> Makefile
+
+          # Agregar CONFIG_KSU al defconfig si no está
+          grep -q 'CONFIG_KSU' arch/arm64/configs/vayu_defconfig || \
+            echo 'CONFIG_KSU=y' >> arch/arm64/configs/vayu_defconfig
+
       - name: Setup Swap
         run: |
           sudo fallocate -l 16G /swapfile
@@ -61,7 +76,7 @@ jobs:
           name: ${{ env.ZIP_NAME }}
           tag_name: ${{ github.run_id }}
           body: |
-            Non KernelSU
+            KernelSU NEXT
             Automatically compiled with Clang.
             Android 15 ready
 
