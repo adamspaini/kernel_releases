@@ -1,4 +1,4 @@
-name: Build and Release KernelSu Next
+name: Build and Release KernelSu NEXT 
 
 on:
   workflow_dispatch:
@@ -53,139 +53,17 @@ jobs:
             exit 1
           fi
 
-      name: Build and Release Kernel Nonksu
-
-on:
-  workflow_dispatch:
-
-jobs:
-  Kernel:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: ${{ github.workspace }}
-
-    steps:
-      - name: Cleanup
-        run: rm -rf ${{ github.workspace }}/build_output*
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get remove -y gcc-multilib
-          sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev bc ccache lld llvm device-tree-compiler nano ca-certificates curl git libc6-dev openssl python3 python3-pip python-is-python3 ssh wget zip zstd make clang software-properties-common libarchive-tools gcc-13-aarch64-linux-gnu g++-13-aarch64-linux-gnu gcc-13-arm-linux-gnueabi g++-13-arm-linux-gnueabi libffi-dev libreadline-dev libbz2-dev libsqlite3-dev pigz cpio neofetch
-          sudo apt-get upgrade -y
-          neofetch
-
-      - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen --depth=1 .
-
-      - name: Setup Swap
-        run: |
-          sudo fallocate -l 16G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon --priority 10 /swapfile
-
-      - name: Start Compilation
-        run: bash tools/build/build.sh
-
-      - name: Set-up files
-        run: |
-          output_dir="${{ github.workspace }}/output"
-          mkdir -p "$output_dir"
-          echo "Archivos en output/:"
-          ls -lh "$output_dir"
-          zip_file=$(find "$output_dir" -iname 'GoreKernel_*.zip' -print -quit)
-          echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
-          echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
-
-      - name: Check ZIP file exists
-        run: |
-          if [ ! -f "${{ env.ZIP_FILE }}" ]; then
-            echo "Archivo ZIP no encontrado: ${{ env.ZIP_FILE }}"
-            exit 1
-          fi
-
-      name: Build and Release Kernel Nonksu
-
-on:
-  workflow_dispatch:
-
-jobs:
-  Kernel:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: ${{ github.workspace }}
-
-    steps:
-      - name: Cleanup
-        run: rm -rf ${{ github.workspace }}/build_output*
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get remove -y gcc-multilib
-          sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev bc ccache lld llvm device-tree-compiler nano ca-certificates curl git libc6-dev openssl python3 python3-pip python-is-python3 ssh wget zip zstd make clang software-properties-common libarchive-tools gcc-13-aarch64-linux-gnu g++-13-aarch64-linux-gnu gcc-13-arm-linux-gnueabi g++-13-arm-linux-gnueabi libffi-dev libreadline-dev libbz2-dev libsqlite3-dev pigz cpio neofetch
-          sudo apt-get upgrade -y
-          neofetch
-
-      - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b fiveteen --depth=1 .
-
-      - name: Setup Swap
-        run: |
-          sudo fallocate -l 16G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon --priority 10 /swapfile
-
-      - name: Start Compilation
-        run: bash tools/build/build.sh
-
-      - name: Set-up files
-        run: |
-          output_dir="${{ github.workspace }}/output"
-          mkdir -p "$output_dir"
-          echo "Archivos en output/:"
-          ls -lh "$output_dir"
-          zip_file=$(find "$output_dir" -iname 'GoreKernel_*.zip' -print -quit)
-          echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
-          echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
-
-      - name: Check ZIP file exists
-        run: |
-          if [ ! -f "${{ env.ZIP_FILE }}" ]; then
-            echo "Archivo ZIP no encontrado: ${{ env.ZIP_FILE }}"
-            exit 1
-          fi
-
       - name: Upload files to repository releases page
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ${{ env.ZIP_FILE }}
-          name: KernelSU-Next Release
+          name: ${{ env.ZIP_NAME }}
           tag_name: ${{ github.run_id }}
           body: |
-            KernelSU Next
+            KernelSU Next 
             Automatically compiled with Clang.
             Android 15 ready
-
-      - name: Cleanup Swap
-        if: always()
-        run: |
-          sudo swapoff /swapfile || true
-          sudo rm -f /swapfile || true
-
-      - name: Cleanup Swap
-        if: always()
-        run: |
-          sudo swapoff /swapfile || true
-          sudo rm -f /swapfile || true
 
       - name: Cleanup Swap
         if: always()
