@@ -33,7 +33,11 @@ jobs:
 
       - name: Integrate KernelSU to source
         run: |
-          # Añadir include al Makefile si no está
+          # Eliminar líneas rotas anteriores del Makefile
+          sed -i '/\\\/KernelSU\\/d' Makefile
+          sed -i '/KernelSU\\/kernel\\/kernelsu.mk/d' Makefile
+
+          # Agregar include si no está presente
           grep -q 'KernelSU/kernel/kernelsu.mk' Makefile || {
             echo '' >> Makefile
             echo '# KernelSU' >> Makefile
