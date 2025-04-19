@@ -34,12 +34,26 @@ jobs:
       - name: Integrate KernelSU to source
         run: |
           # Añadir include al Makefile si no está
-          grep -q 'KernelSU/kernel/kernelsu.mk' Makefile || \
-            echo -e '\n# KernelSU\ninclude \$(srctree)/KernelSU/kernel/kernelsu.mk' >> Makefile
+          grep -q 'KernelSU/kernel/kernelsu.mk' Makefile || {
+            echo '' >> Makefile
+            echo '# KernelSU' >> Makefile
+            echo 'include \$(srctree)/KernelSU/kernel/kernelsu.mk' >> Makefile
+          }
 
           # Agregar CONFIG_KSU al defconfig si no está
           grep -q 'CONFIG_KSU' arch/arm64/configs/vayu_defconfig || \
             echo 'CONFIG_KSU=y' >> arch/arm64/configs/vayu_defconfig
+
+      - name: Verify CONFIG_KSU is set
+        run: |
+          make O=out vayu_defconfig
+          if ! grep -q 'CONFIG_KSU=y' out/.config; then
+            echo "ERROR: CONFIG_KSU=y no está presente en .config"
+            echo "Verifica que el Makefile y el defconfig estén correctamente configurados."
+            exit 1
+          else
+            echo "✅ CONFIG_KSU=y detectado correctamente"
+          fi
 
       - name: Setup Swap
         run: |
