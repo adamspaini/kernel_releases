@@ -58,9 +58,10 @@ jobs:
         with:
           files: |
             ${{ env.ZIP_FILE }}
-          name: KernelSU-Next Release
+          name: ${{ env.ZIP_NAME }}
+          tag_name: ${{ github.run_id }}
           body: |
-            KernelSU Next 
+            KernelSu Next
             Automatically compiled with Clang.
             Android 15 ready
 
