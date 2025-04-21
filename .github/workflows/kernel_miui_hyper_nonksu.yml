@@ -1,4 +1,4 @@
-name: Build and Release Kernel MIUI and HYPEROS
+name: Build and Release Kernel MIUI and HYPEROS NonKsu
 
 on:
   workflow_dispatch:
