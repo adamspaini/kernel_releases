@@ -1,4 +1,4 @@
-name: Build and Release Kernel MIUI
+name: Build and Release Kernel MIUI and HYPEROS
 
 on:
   workflow_dispatch:
