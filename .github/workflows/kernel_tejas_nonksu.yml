@@ -61,7 +61,7 @@ jobs:
           name: ${{ env.ZIP_NAME }}
           tag_name: ${{ github.run_id }}
           body: |
-            Non KernelSU
+            Kernel noksu source by tejas 
             Automatically compiled with Clang.
             Android 15 ready
 
