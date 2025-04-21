@@ -1,4 +1,4 @@
-name: Build and Release gxc kernel nonksu
+name: Build and Release KernelSu MIUI and HYPEROS
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
           neofetch
 
       - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/platform_kernel_xiaomi_vayu.git -b main --depth=1 .
+        run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b miui-ksu --depth=1 .
 
       - name: Setup Swap
         run: |
@@ -61,9 +61,9 @@ jobs:
           name: ${{ env.ZIP_NAME }}
           tag_name: ${{ github.run_id }}
           body: |
-            Kernel noksu source by gxc 
+            KernelSU
             Automatically compiled with Clang.
-            Android 15 ready
+            Try on MIUI or HYPER
 
       - name: Cleanup Swap
         if: always()
