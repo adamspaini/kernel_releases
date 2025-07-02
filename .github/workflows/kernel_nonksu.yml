@@ -24,7 +24,7 @@ jobs:
           neofetch
 
       - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/kernel_xiaomi_vayu.git -b fifteen --depth=1 .
+        run: git clone https://github.com/adamspaini/Xiaomi_Kernel_rodin.git -b bsp-rodin-v-oss --depth=1 .
 
       - name: Setup Swap
         run: |
@@ -34,7 +34,7 @@ jobs:
           sudo swapon --priority 10 /swapfile
 
       - name: Start Compilation
-        run: bash tools/build/build.sh
+        run: bash tools/build/rodin.sh
 
       - name: Set-up files
         run: |
