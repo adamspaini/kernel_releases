@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 env:
   REPO_USE_SSH: "true"
-  CCACHE_SIZE: "10G"
+  CCACHE_SIZE: "5G"
 
 jobs:
   PixelOS:
@@ -15,20 +15,26 @@ jobs:
         working-directory: ${{ github.workspace }}
 
     steps:
-      - name: Cleanup
-        run: rm -rf ${{ github.workspace }}/*
+      - name: Check Disk Space
+        run: |
+          df -h
+          sudo apt-get clean
+          sudo rm -rf /usr/local/lib/android/sdk/ndk-bundle || true
 
-      - name: Install Dependencies
+      - name: Cleanup
+        run: |
+          rm -rf ${{ github.workspace }}/*
+          sudo rm -rf /var/lib/apt/lists/*
+
+      - name: Install Dependencies (Optimized)
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y bc bison build-essential curl flex git gnupg gperf libncurses-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev gcc-multilib g++-multilib lib32z1-dev liblz4-tool python3 python3-pip openjdk-17-jdk repo unzip p7zip-full neofetch
-          sudo apt-get install -y libncurses5-dev libncursesw5-dev || sudo apt-get install -y libncurses-dev
-          sudo apt-get install -y libtinfo5 || sudo apt-get install -y libtinfo-dev
-          neofetch
+          sudo apt-get install -y --no-install-recommends bc bison build-essential curl flex git gnupg gperf libncurses-dev libssl-dev libxml2 libxml2-utils lzop pngcrush squashfs-tools xsltproc zip zlib1g-dev gcc-multilib g++-multilib lib32z1-dev python3 python3-pip openjdk-17-jdk repo unzip
+          sudo apt-get clean
 
       - name: Setup Swap
         run: |
-          sudo fallocate -l 16G /swapfile
+          sudo fallocate -l 8G /swapfile  # Reducido de 16G a 8G
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
@@ -45,10 +51,10 @@ jobs:
           mkdir rom && cd rom
           repo init -u https://github.com/PixelOS-Fifteen/manifest.git -b fifteen --depth=1
 
-      - name: Sync ROM Source
+      - name: Sync ROM Source (Optimized)
         run: |
           cd rom
-          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --force-sync -j$(nproc --all)
+          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --force-sync -j$(nproc --all) --prune
 
       - name: Clone Device Trees
         run: |
