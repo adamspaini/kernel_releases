@@ -31,13 +31,15 @@ jobs:
           sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
-          sudo swapon --priority 10 /swapfile
+          sudo swapon /swapfile
+          sudo swapon --show  # Verificación
 
       - name: Configure ccache
         run: |
           echo "CCACHE_DIR=$GITHUB_WORKSPACE/ccache" >> $GITHUB_ENV
           mkdir -p $CCACHE_DIR
           ccache -M ${{ env.CCACHE_SIZE }}
+          ccache -s  # Verificación inicial
 
       - name: Initialize ROM Source
         run: |
