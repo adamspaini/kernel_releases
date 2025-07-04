@@ -2,6 +2,10 @@ name: Build and Release PixelOS ROM
 
 on: workflow_dispatch
 
+env:
+  REPO_USE_SSH: "true"
+  CCACHE_SIZE: "10G"
+
 jobs:
   PixelOS:
     runs-on: ubuntu-latest
@@ -17,9 +21,12 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y bc bison build-essential curl flex git gnupg gperf libncurses-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev gcc-multilib g++-multilib lib32z1-dev liblz4-tool python3 python3-pip openjdk-17-jdk repo unzip p7zip-full neofetch
-          sudo apt-get install -y libncurses5-dev libncursesw5-dev || sudo apt-get install -y libncurses-dev
-          sudo apt-get install -y libtinfo5 || sudo apt-get install -y libtinfo-dev
+          sudo apt-get install -y bc bison build-essential ccache curl flex git gnupg gperf \
+            libncurses-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
+            schedtool squashfs-tools xsltproc zip zlib1g-dev gcc-multilib g++-multilib \
+            lib32z1-dev liblz4-tool python3 python3-pip openjdk-11-jdk repo unzip p7zip-full \
+            neofetch libtinfo5
+          sudo apt-get clean
           neofetch
 
       - name: Setup Swap
@@ -29,17 +36,21 @@ jobs:
           sudo mkswap /swapfile
           sudo swapon --priority 10 /swapfile
 
+      - name: Configure ccache
+        run: |
+          echo "CCACHE_DIR=$GITHUB_WORKSPACE/ccache" >> $GITHUB_ENV
+          mkdir -p $CCACHE_DIR
+          ccache -M ${{ env.CCACHE_SIZE }}
+
       - name: Initialize ROM Source
         run: |
-          git config --global user.name "GitHubActions"
-          git config --global user.email "actions@github.com"
           mkdir rom && cd rom
-          repo init -u https://github.com/PixelOS-AOSP/manifest -b fourteen --depth=1
+          repo init -u https://github.com/PixelOS-Fifteen/manifest.git -b fifteen --depth=1
 
       - name: Sync ROM Source
         run: |
           cd rom
-          repo sync -c --no-clone-bundle --no-tags -j4
+          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --force-sync -j4
 
       - name: Clone Device Trees
         run: |
@@ -47,38 +58,56 @@ jobs:
           git clone https://github.com/adamspaini/device_xiaomi_vayu.git device/xiaomi/vayu
           git clone https://github.com/adamspaini/kernel_xiaomi_vayu_A16.git -b 16 kernel/xiaomi/sm8150
           git clone https://github.com/adamspaini/vendor_xiaomi_vayu-blaze.git vendor/xiaomi
+          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
 
       - name: Build ROM
         run: |
           cd rom
           source build/envsetup.sh
           lunch aosp_vayu-userdebug
-          mka bacon -j$(nproc)
+          export CCACHE_DIR=$GITHUB_WORKSPACE/ccache
+          export CCACHE_EXEC=$(which ccache)
+          export USE_CCACHE=1
+          ccache -o compression=true
+          mka bacon -j2
 
-      - name: Find ROM ZIP
+      - name: Check build artifacts
         run: |
           cd rom
-          zip_file=$(find out/target/product/vayu -iname '*.zip' -print -quit)
-          echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
-          echo "ZIP_NAME=$(basename $zip_file .zip)" >> $GITHUB_ENV
-
-      - name: Check ZIP file exists
-        run: |
-          if [ ! -f "${{ env.ZIP_FILE }}" ]; then
-            echo "ROM ZIP no encontrado: ${{ env.ZIP_FILE }}"
+          if [ -d "out/target/product/vayu" ]; then
+            zip_file=$(find out/target/product/vayu -maxdepth 1 -iname '*.zip' -print -quit)
+            if [ -n "$zip_file" ]; then
+              echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
+              echo "ZIP_NAME=$(basename $zip_file .zip)" >> $GITHUB_ENV
+            else
+              echo "No se encontró archivo ZIP en la salida"
+              exit 1
+            fi
+          else
+            echo "No se encontró el directorio de salida"
             exit 1
           fi
 
       - name: Upload ROM to Releases
         uses: softprops/action-gh-release@v1
+        if: success()
         with:
           files: ${{ env.ZIP_FILE }}
           name: ${{ env.ZIP_NAME }}
-          tag_name: ${{ github.run_id }}
+          tag_name: build-${{ github.run_id }}
           body: |
-            PixelOS for vayu
-            Compiled automatically with CircleCI
-            Android 15 - PixelOs
+            PixelOS for vayu (Poco X3 Pro)
+            Compilación automática - CircleCi
+            Android 15 - PixelOS
+            Build ID: ${{ github.run_id }}
+
+      - name: Show ccache stats
+        if: always()
+        run: ccache -s
+
+      - name: Check disk usage
+        if: always()
+        run: df -h
 
       - name: Cleanup Swap
         if: always()
