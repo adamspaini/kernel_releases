@@ -17,7 +17,9 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y bc bison build-essential curl flex git gnupg gperf libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev gcc-multilib g++-multilib lib32z1-dev liblz4-tool libncurses5 python3 python3-pip openjdk-17-jdk repo libtinfo5 unzip p7zip-full neofetch
+          sudo apt-get install -y bc bison build-essential curl flex git gnupg gperf libncurses-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev gcc-multilib g++-multilib lib32z1-dev liblz4-tool python3 python3-pip openjdk-17-jdk repo unzip p7zip-full neofetch
+          sudo apt-get install -y libncurses5-dev libncursesw5-dev || sudo apt-get install -y libncurses-dev
+          sudo apt-get install -y libtinfo5 || sudo apt-get install -y libtinfo-dev
           neofetch
 
       - name: Setup Swap
