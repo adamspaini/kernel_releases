@@ -24,7 +24,7 @@ jobs:
           neofetch
 
       - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/kernel_xiaomi_vayu_A16.git -b 16 --depth=1 .
+        run: git clone https://github.com/adamspaini/android_kernel_vayu.git -b main --depth=1 .
 
       - name: Setup Swap
         run: |
