@@ -36,9 +36,9 @@ steps:
   - name: Clone Device Trees
     run: |
       cd rom
-      git clone https://github.com/PixelOS-AOSP/device_xiaomi_vayu.git device/xiaomi/vayu
-      git clone https://github.com/PixelOS-AOSP/kernel_xiaomi_sm8150.git kernel/xiaomi/sm8150
-      git clone https://github.com/TheMuppets/proprietary_vendor_xiaomi.git vendor/xiaomi
+      git clone https://github.com/adamspaini/device_xiaomi_vayu.git device/xiaomi/vayu
+      git clone https://github.com/adamspaini/kernel_xiaomi_vayu_A16.git -b 16 kernel/xiaomi/sm8150
+      git clone https://github.com/adamspaini/vendor_xiaomi_vayu-blaze.git vendor/xiaomi
 
   - name: Build ROM
     run: |
@@ -69,8 +69,8 @@ steps:
       tag_name: ${{ github.run_id }}
       body: |
         PixelOS for vayu
-        Compiled automatically with GitHub Actions.
-        Android 14 - Pixel experience
+        Compiled automatically with CircleCI
+        Android 15 - PixelOs
 
   - name: Cleanup Swap
     if: always()
