@@ -33,6 +33,12 @@ jobs:
           sudo mkswap /swapfile
           sudo swapon /swapfile
 
+      - name: Setup Repo Tool
+        run: |
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          echo "$HOME/bin" >> $GITHUB_PATH
 
       - name: Initialize ROM Source
         run: |
@@ -42,7 +48,7 @@ jobs:
       - name: Sync ROM Source
         run: |
           cd rom
-          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --force-sync -j4
+          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --force-sync -j$(nproc --all)
 
       - name: Clone Device Trees
         run: |
@@ -61,7 +67,7 @@ jobs:
           export CCACHE_EXEC=$(which ccache)
           export USE_CCACHE=1
           ccache -o compression=true
-          mka bacon -j2
+          mka bacon -j$(($(nproc --all)/2))
 
       - name: Check build artifacts
         run: |
