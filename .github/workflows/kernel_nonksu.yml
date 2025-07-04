@@ -42,7 +42,7 @@ jobs:
           mkdir -p "$output_dir"
           echo "Archivos en output/:"
           ls -lh "$output_dir"
-          zip_file=$(find "$output_dir" -iname 'GoreKernel_*.zip' -print -quit)
+          zip_file=$(find "$output_dir" -iname 'GoreKernel_nonksu_*.zip' -print -quit)
           echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
           echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
 
