@@ -24,7 +24,7 @@ jobs:
           neofetch
 
       - name: Clone kernel source
-        run: git clone https://github.com/adamspaini/kernel_vayu_sm8150_.git -b miui --depth=1 .
+        run: git clone https://github.com/adamspaini/android_kernel_vayu_lineage.git -b main-miui --depth=1 .
 
       - name: Setup Swap
         run: |
